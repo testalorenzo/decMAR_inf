@@ -62,8 +62,8 @@ if __name__ == "__main__":
     settings = ['logistic', 'MCAR']
     mu_models = ['linear']
     pi_models = ['logistic', 'constant']
-    metric = 'coverage'  # 'MSE' or 'coverage'
-    target = 'mean' # 'mean' or 'coef'
+    metric = 'MSE'  # 'MSE' or 'coverage'
+    target = 'coef' # 'mean' or 'coef'
 
     for setting, mu_model, pi_model in itertools.product(settings, mu_models, pi_models):
 
@@ -128,7 +128,7 @@ if __name__ == "__main__":
                     true = np.array(sim['estimates']['true_theta'])
                     cov = sim['estimates'][f"{method}_cov"]
 
-                    mse = np.mean((est.astype(float) - true.astype(float)) ** 2, axis=1)
+                    mse = np.sqrt(np.mean((est.astype(float) - true.astype(float)) ** 2, axis=1))
                     method_mse.append(mse)
                     method_cov.append(cov)
 
@@ -154,7 +154,7 @@ if __name__ == "__main__":
             # Convert cov_data elements to float
             cov_data = [np.array(c, dtype=float) for c in cov_data]
 
-            methods_name = ['AIPW', 'OR', 'IPW', 'Naive']
+            methods_name = ['DS$^3$', 'OR', 'IPW', 'Naive']
 
             plot_box = pd.DataFrame(mse_data).T
             plot_box.columns = methods_name
@@ -170,7 +170,7 @@ if __name__ == "__main__":
 
                 axd[str(n) + '_' + str(multiplier)].set_title(f'n = {n}, N = {N}')
                 if n == 100:
-                    axd[str(n) + '_' + str(multiplier)].set_ylabel('MSE')
+                    axd[str(n) + '_' + str(multiplier)].set_ylabel('RMSE')
                 else:
                     axd[str(n) + '_' + str(multiplier)].set_ylabel('')
                 if multiplier == 100:

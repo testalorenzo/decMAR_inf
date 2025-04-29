@@ -68,6 +68,8 @@ class LogisticRegressionWithOffset(BaseEstimator, ClassifierMixin):
 
 if __name__ == '__main__':
 
+    full_analysis = False
+
     #
     # Preprocessing
     #
@@ -127,7 +129,7 @@ if __name__ == '__main__':
     clinical = clinical.dropna()
 
     # One-hot encode categorical variables
-    clinical = pd.get_dummies(clinical, columns=['INFERRED_MENOPAUSAL_STATE', 
+    clinical = pd.get_dummies(clinical, columns=['INFERRED_MENOPAUSAL_STATE',
                                                  'RADIO_THERAPY',
                                                  'CHEMOTHERAPY',
                                                  'HORMONE_THERAPY',
@@ -141,9 +143,15 @@ if __name__ == '__main__':
 
     # Format label to make supervised/unsupervised analysis
     # 1: died of cancer; 0: otherwise
-    R = R.replace({'Died of Disease': 1,
-                     'Died of Other Causes': 0,
-                     'Living': 0})
+    if full_analysis:
+        R = R.replace({'Died of Disease': 1,
+                    'Died of Other Causes': 0,
+                    'Living': 0})
+    else:
+        R = R.replace({'Died of Disease': 1,
+                    'Died of Other Causes': 0,
+                    'Living': 2})
+        R = R[R != 2]
     R = R.dropna()
 
     # Create supervised datasets
@@ -271,11 +279,11 @@ if __name__ == '__main__':
         'Biomarker': biomarkers * 2,
         'Estimate': np.concatenate([theta_hat, naive]),
         'SE': np.concatenate([1.645 * se, 1.645 * se_naive]),
-        'Method': ['Ours'] * len(biomarkers) + ['Naive'] * len(biomarkers)
+        'Method': ['DS$^3$'] * len(biomarkers) + ['Naive'] * len(biomarkers)
     })
 
     sns.pointplot(data=df_plot, x='Biomarker', y='Estimate', hue='Method', dodge=0.4,
-                  palette={'Ours': palette[0], 'Naive':palette[3]}, errorbar=None, ax=axd['coef'],
+                  palette={'DS$^3$': palette[0], 'Naive':palette[3]}, errorbar=None, ax=axd['coef'],
                   markersize=3, linestyle='none')
 
     # Add error bars manually
@@ -295,4 +303,32 @@ if __name__ == '__main__':
 
     sns.move_legend(axd['coef'], "upper right", ncol=2, title='')
 
-    plt.savefig('app.pdf', bbox_inches='tight')
+    if full_analysis:
+        plt.savefig('app.pdf', bbox_inches='tight')
+    else:
+        plt.savefig('app_competing.pdf', bbox_inches='tight')
+
+    # Plot Y vs mu_hat1
+    axd = plt.figure(figsize=set_size(width, subplots=(1,1))).subplot_mosaic(
+        [['main']],
+        gridspec_kw = {'wspace':0.05, 'hspace':0.05}
+    )
+
+    mu_hat1 = mu_hat[full_R == 1]
+
+    df = pd.DataFrame({
+        'Y': Y,
+        'mu_hat': mu_hat1,
+    })
+
+    sns.scatterplot(data=df, x='Y', y='mu_hat', ax=axd['main'], color=palette[0])
+    axd['main'].set_xlabel('Y')
+    axd['main'].set_ylabel('$\hat\mu$')
+    axd['main'].set_title('Joint distribution of Y and $\hat\mu$ in $R=1$ group')
+    # add line y=x
+    axd['main'].plot([20, 175], [20, 175], linestyle='--', color='gray')
+
+    if full_analysis:
+        plt.savefig('jointplot_Ymu.pdf', bbox_inches='tight')
+    else:
+        plt.savefig('jointplot_Ymu_competing.pdf', bbox_inches='tight')

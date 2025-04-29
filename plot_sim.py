@@ -106,7 +106,7 @@ if __name__ == "__main__":
             true = np.array(sim['estimates']['true_theta'])
             cov = sim['estimates'][f"{method}_cov"]
 
-            mse = np.mean((est.astype(float) - true.astype(float)) ** 2, axis=1)
+            mse = np.sqrt(np.mean((est.astype(float) - true.astype(float)) ** 2, axis=1))
             method_mse.append(mse)
             method_cov.append(cov)
 
@@ -132,7 +132,7 @@ if __name__ == "__main__":
     # Convert cov_data elements to float
     cov_data = [np.array(c, dtype=float) for c in cov_data]
 
-    methods = ['AIPW', 'OR', 'IPW', 'Naive']
+    methods = ['DS$^3$', 'OR', 'IPW', 'Naive']
 
     plot_box = pd.DataFrame(mse_data).T
     plot_box.columns = methods
@@ -147,9 +147,9 @@ if __name__ == "__main__":
         fliersize=3
     )
 
-    axd['mse'].set_title('MSE Distribution')
+    axd['mse'].set_title('RMSE Distribution')
     axd['mse'].set_xlabel('Method')
-    axd['mse'].set_ylabel('MSE')
+    axd['mse'].set_ylabel('RMSE')
     axd['mse'].tick_params(pad=-3)
 
     # Calculate mean and standard error for coverage
@@ -226,7 +226,7 @@ if __name__ == "__main__":
             true = np.array(sim['estimates']['true_theta'])
             cov = sim['estimates'][f"{method}_cov"]
 
-            mse = np.mean((est.astype(float) - true.astype(float)) ** 2, axis=1)
+            mse = np.sqrt(np.mean((est.astype(float) - true.astype(float)) ** 2, axis=1))
             method_mse.append(mse)
             method_cov.append(cov)
 
@@ -252,7 +252,7 @@ if __name__ == "__main__":
     # Convert cov_data elements to float
     cov_data = [np.array(c, dtype=float) for c in cov_data]
 
-    methods = ['AIPW', 'OR', 'IPW', 'Naive']
+    methods = ['DS$^3$', 'OR', 'IPW', 'Naive']
 
     plot_box = pd.DataFrame(mse_data).T
     plot_box.columns = methods
@@ -267,9 +267,9 @@ if __name__ == "__main__":
         fliersize=3
     )
 
-    axd['mse'].set_title('MSE Distribution')
+    axd['mse'].set_title('RMSE Distribution')
     axd['mse'].set_xlabel('Method')
-    axd['mse'].set_ylabel('MSE')
+    axd['mse'].set_ylabel('RMSE')
     axd['mse'].tick_params(pad=-3)
 
     # Calculate mean and standard error for coverage

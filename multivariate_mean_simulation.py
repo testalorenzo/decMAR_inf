@@ -159,7 +159,7 @@ if __name__ == '__main__':
     ns = [100, 1000, 10000]
     N_multipliers = [10, 100]
     settings = ['logistic', 'MCAR']
-    mu_models = ['rf']
+    mu_models = ['linear', 'rf']
     pi_models = ['logistic', 'constant']
 
     ext_loop = []
